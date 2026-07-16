@@ -7,7 +7,7 @@ namespace TEdit.Editor.Plugins;
 public class ReplayRecorder
 {
     private DateTime _startTime;
-    private int _lastUndoIndex;
+    private DateTime _lastTime;
 
     public ReplayFile Recording { get; private set; }
     public bool IsRecording { get; private set; }
@@ -15,7 +15,7 @@ public class ReplayRecorder
     public void Start()
     {
         _startTime = DateTime.UtcNow;
-        _lastUndoIndex = ViewModelLocator.WorldViewModel.UndoManager.CurrentIndex;
+        _lastTime = DateTime.MinValue;
         IsRecording = true;
 
         Recording = new ReplayFile { StartTime = _startTime };
@@ -25,26 +25,22 @@ public class ReplayRecorder
     {
         if (!IsRecording) return;
 
-        var undoManager = ViewModelLocator.WorldViewModel.UndoManager;
-        int currentIndex = undoManager.CurrentIndex;
-        if (currentIndex <= _lastUndoIndex) return;
+        string undoDir = Path.GetDirectoryName(
+            ViewModelLocator.WorldViewModel.UndoManager.GetUndoFileName());
 
-        string undoDir = Path.GetDirectoryName(undoManager.GetUndoFileName());
-
-        for (int i = _lastUndoIndex; i < currentIndex; i++)
+        foreach (string file in Directory.GetFiles(undoDir, "undo_temp_*"))
         {
-            string undoFile = Path.Combine(undoDir, $"undo_temp_{i}");
-            if (!File.Exists(undoFile)) continue;
+            DateTime writeTime = File.GetLastWriteTimeUtc(file);
+            if (writeTime <= _lastTime) continue;
 
+            _lastTime = writeTime;
             Recording.Frames.Add(new ReplayFrame
             {
                 Index = Recording.Frames.Count,
                 Time = (long)(DateTime.UtcNow - _startTime).TotalMilliseconds,
-                Data = File.ReadAllBytes(undoFile),
+                Data = File.ReadAllBytes(file),
             });
         }
-
-        _lastUndoIndex = currentIndex;
     }
 
     public ReplayFile Stop()
