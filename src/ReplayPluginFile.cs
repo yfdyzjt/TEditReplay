@@ -45,7 +45,7 @@ public class ReplayFile
         writer.Write(System.Text.Encoding.UTF8.GetBytes(Magic));
     }
 
-    public static ReplayFile Load(string path)
+    public void Load(string path)
     {
         using var stream = new FileStream(path, FileMode.Open);
         using var reader = new BinaryReader(stream);
@@ -53,12 +53,9 @@ public class ReplayFile
         string magic = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(4));
         if (magic != Magic) throw new TEditFileFormatException("Not a replay file.");
 
-        var file = new ReplayFile
-        {
-            Version = reader.ReadInt32(),
-            StartTime = DateTimeOffset.FromUnixTimeMilliseconds(reader.ReadInt64()).DateTime,
-            TotalTime = reader.ReadInt64(),
-        };
+        Version = reader.ReadInt32();
+        StartTime = DateTimeOffset.FromUnixTimeMilliseconds(reader.ReadInt64()).DateTime;
+        TotalTime = reader.ReadInt64();
 
         int frameCount = reader.ReadInt32();
 
@@ -66,7 +63,7 @@ public class ReplayFile
         byte[] baselineBytes = reader.ReadBytes(baselineLen);
 
         for (int i = 0; i < frameCount; i++)
-            file.Frames.Add(ReplayFrame.Read(reader, i));
+            Frames.Add(ReplayFrame.Read(reader, i));
 
         magic = System.Text.Encoding.UTF8.GetString(reader.ReadBytes(4));
         if (magic != Magic) throw new TEditFileFormatException("Replay file footer mismatch.");
@@ -77,8 +74,7 @@ public class ReplayFile
         File.Delete(tempFile);
         if (error != null) throw error;
 
-        file.BaselineWorld = world;
-        return file;
+        BaselineWorld = world;
     }
 }
 
