@@ -15,7 +15,7 @@ public class ReplayRecorder
     public void Start()
     {
         _startTime = DateTime.UtcNow;
-        _lastTime = DateTime.MinValue;
+        _lastTime = DateTime.UtcNow;
         IsRecording = true;
 
         Recording = new ReplayFile { StartTime = _startTime };
