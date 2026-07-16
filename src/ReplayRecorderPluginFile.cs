@@ -9,7 +9,7 @@ namespace TEdit.Editor.Plugins;
 
 public class ReplayFile
 {
-    public const string Magic = "TERP";
+    public const string Magic = "TRRP";
     public const int FormatVersion = 1;
 
     public int Version { get; set; } = FormatVersion;
