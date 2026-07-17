@@ -52,11 +52,13 @@ public partial class ReplayPluginRecorderView
             _recorder.Recording.Save(defaultPath);
 
         RecordButton.Content = "⏺";
-        TimerText.Text = "00:00:00";
+        TimerText.Text = "00:00:00 F:0";
     }
 
     private void OpenButton_Click(object sender, RoutedEventArgs e)
     {
+        if (_recorder.IsRecording) return;
+
         var dialog = new OpenFileDialog { Filter = "Replay Files|*.TEditReplay" };
         if (dialog.ShowDialog() != true) return;
 
@@ -85,7 +87,7 @@ public partial class ReplayPluginRecorderView
         if (_recorder.Recording != null)
         {
             var elapsed = DateTime.UtcNow - _recorder.Recording.StartTime;
-            TimerText.Text = elapsed.ToString(@"hh\:mm\:ss");
+            TimerText.Text = $"{elapsed:hh\\:mm\\:ss} F:{_recorder.Recording.Frames.Count}";
         }
     }
 }

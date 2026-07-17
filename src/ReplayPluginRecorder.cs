@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TEdit.ViewModel;
 
 namespace TEdit.Editor.Plugins;
@@ -28,20 +30,25 @@ public class ReplayRecorder
         string undoDir = Path.GetDirectoryName(
             ViewModelLocator.WorldViewModel.UndoManager.GetUndoFileName());
 
+        var pending = new List<(string Path, DateTime WriteTime)>();
         foreach (string file in Directory.GetFiles(undoDir, "undo_temp_*"))
         {
             DateTime writeTime = File.GetLastWriteTimeUtc(file);
-            if (writeTime <= _lastTime) continue;
+            if (writeTime > _lastTime) pending.Add((file, writeTime));
+        }
 
+        pending.Sort((a, b) => a.WriteTime.CompareTo(b.WriteTime));
+        foreach (var (path, writeTime) in pending)
+        {
             byte[] data;
-            try { data = File.ReadAllBytes(file); }
-            catch (IOException) { continue; }
+            try { data = File.ReadAllBytes(path); }
+            catch (IOException) { break; }
 
             _lastTime = writeTime;
             Recording.Frames.Add(new ReplayFrame
             {
                 Index = Recording.Frames.Count,
-                Time = (long)(DateTime.UtcNow - _startTime).TotalMilliseconds,
+                Time = (long)(writeTime - _startTime).TotalMilliseconds,
                 Data = data,
             });
         }

@@ -8,13 +8,13 @@ namespace TEdit.Editor.Plugins;
 
 public partial class ReplayPluginPlayerView
 {
-    private static readonly double[] Speeds = [0.25, 0.5, 1.0, 2.0, 4.0];
-    private static readonly string[] SpeedLabels = ["0.25x", "0.5x", "1x", "2x", "4x"];
-    private static readonly int[] Delays = [50, 100, 250, 500, 1000, 2000];
-    private static readonly string[] DelayLabels = ["50ms", "100ms", "250ms", "500ms", "1s", "2s"];
+    private static readonly double[] Speeds = [0.5, 1.0, 2.0, 4.0, 16.0];
+    private static readonly string[] SpeedLabels = ["0.5x", "1x", "2x", "4x", "16x"];
+    private static readonly int[] Delays = [10, 50, 100, 250, 500, 1000];
+    private static readonly string[] DelayLabels = ["10ms", "50ms", "100ms", "250ms", "500ms", "1000ms"];
 
     private ReplayPlayer _player;
-    private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(50) };
+    private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(10) };
     private bool _seeking;
 
     public ReplayPluginPlayerView()
@@ -32,7 +32,7 @@ public partial class ReplayPluginPlayerView
         ViewModelLocator.WorldViewModel.CurrentWorld = file.BaselineWorld;
 
         ModeCombo.SelectedIndex = 0;
-        RateCombo.SelectedIndex = 2;
+        RateCombo.SelectedIndex = 1;
 
         UpdateDisplay();
     }
@@ -89,21 +89,21 @@ public partial class ReplayPluginPlayerView
     {
         if (_player == null) return;
 
-        var mode = ModeCombo.SelectedIndex == 0 ? PlaybackMode.Speed : PlaybackMode.Delay;
-        _player.SetMode(mode);
-
         RateCombo.Items.Clear();
-        if (mode == PlaybackMode.Speed)
+        if (ModeCombo.SelectedIndex == 0)
         {
+            _player.SetMode(PlaybackMode.Speed);
+            RateCombo.SelectedIndex = 1;
             foreach (var label in SpeedLabels)
                 RateCombo.Items.Add(new ComboBoxItem { Content = label });
         }
         else
         {
+            _player.SetMode(PlaybackMode.Delay);
+            RateCombo.SelectedIndex = 2;
             foreach (var label in DelayLabels)
                 RateCombo.Items.Add(new ComboBoxItem { Content = label });
         }
-        RateCombo.SelectedIndex = 2;
 
         UpdateDisplay();
     }

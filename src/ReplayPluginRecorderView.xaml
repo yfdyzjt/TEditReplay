@@ -21,7 +21,7 @@
                     FontSize="18" Margin="0,0,4,0" Click="RecordButton_Click"/>
             <Button x:Name="OpenButton" Content="&#x1F4C2;" Width="48" Height="36"
                     FontSize="18" Margin="0,0,8,0" Click="OpenButton_Click"/>
-            <TextBlock x:Name="TimerText" Text="00:00:00" VerticalAlignment="Center"
+            <TextBlock x:Name="TimerText" Text="00:00:00 F:0" VerticalAlignment="Center"
                        FontFamily="Consolas" FontSize="36"/>
         </StackPanel>
     </Grid>

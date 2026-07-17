@@ -32,13 +32,13 @@
                 <ComboBoxItem Content="Speed" IsSelected="True"/>
                 <ComboBoxItem Content="Delay"/>
             </ComboBox>
-            <ComboBox x:Name="RateCombo" Width="80"
+            <ComboBox x:Name="RateCombo" Width="96"
                       SelectionChanged="RateCombo_SelectionChanged">
-                <ComboBoxItem Content="0.25x"/>
                 <ComboBoxItem Content="0.5x"/>
                 <ComboBoxItem Content="1x" IsSelected="True"/>
                 <ComboBoxItem Content="2x"/>
                 <ComboBoxItem Content="4x"/>
+                <ComboBoxItem Content="16x"/>
             </ComboBox>
         </StackPanel>
 
