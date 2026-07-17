@@ -38,12 +38,13 @@ public partial class ReplayPluginRecorderView
         _timer.Stop();
         _recorder.Stop();
 
-        var worldName = Path.GetFileNameWithoutExtension(ViewModelLocator.WorldViewModel.CurrentFile);
+        var title = _recorder.Recording.BaselineWorld.Title;
+        var worldName = string.Join("-", title.Split(Path.GetInvalidFileNameChars()));
         var startTime = _recorder.Recording.StartTime.ToString("yyyyMMddHHmm");
 
         var defaultName = $"{worldName}_{startTime}";
         var defaultPath = Path.Combine(Path.GetTempPath(), $"{defaultName}.TEditReplay");
-        
+
         var dialog = new SaveFileDialog { FileName = defaultName, Filter = "Replay Files|*.TEditReplay" };
         if (dialog.ShowDialog() == true)
             _recorder.Recording.Save(dialog.FileName);

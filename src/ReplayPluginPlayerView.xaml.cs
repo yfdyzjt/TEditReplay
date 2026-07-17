@@ -144,9 +144,9 @@ public partial class ReplayPluginPlayerView
         else
         {
             ProgressSlider.Value = _player.CurrentIndex;
-            ProgressSlider.Maximum = _player.FrameCount - 1;
+            ProgressSlider.Maximum = _player.FrameCount;
 
-            PositionText.Text = $"{_player.CurrentIndex + 1} / {_player.FrameCount}";
+            PositionText.Text = $"{_player.CurrentIndex} / {_player.FrameCount}";
         }
     }
 }

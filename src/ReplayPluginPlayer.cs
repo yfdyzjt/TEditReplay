@@ -90,7 +90,7 @@ public class ReplayPlayer
     public void Seek(int targetIndex)
     {
         if (targetIndex < 0) targetIndex = 0;
-        if (targetIndex >= _redoFrames.Count) targetIndex = _redoFrames.Count - 1;
+        if (targetIndex > _redoFrames.Count) targetIndex = _redoFrames.Count;
 
         if (targetIndex > _currentIndex)
         {
@@ -121,18 +121,18 @@ public class ReplayPlayer
     public void OnTick()
     {
         if (!_isPlaying) return;
-
+        
         double dt = (DateTime.UtcNow - _lastTime).TotalMilliseconds;
         if (_mode == PlaybackMode.Speed)
         {
-            if (_currentIndex >= _redoFrames.Count)
-                _currentIndex = _redoFrames.Count - 1;
-
             _playTime += dt * _speed;
             _lastTime = DateTime.UtcNow;
 
-            if (_playTime > _totalTime)
-            { _playTime = _totalTime; Pause(); }
+            if (_playTime >= _totalTime)
+            {
+                _playTime = _totalTime;
+                _isPlaying = false;
+            }
 
             while (_currentIndex < _redoFrames.Count &&
                    _playTime >= _redoFrames[_currentIndex].Time)
@@ -144,10 +144,11 @@ public class ReplayPlayer
         {
             if (_currentIndex >= _redoFrames.Count)
             {
-                _currentIndex = _redoFrames.Count - 1;
-                Pause();
+                _isPlaying = false;
+                return;
             }
-            else if (dt >= _stepDelayTime)
+
+            if (dt >= _stepDelayTime)
             {
                 ApplyFrame(_redoFrames[_currentIndex++]);
                 _lastTime = DateTime.UtcNow;
