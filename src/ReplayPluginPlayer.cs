@@ -27,7 +27,7 @@ public class ReplayPlayer
     public int CurrentIndex => _currentIndex;
     public int FrameCount => _redoFrames.Count;
     public bool IsPlaying => _isPlaying;
-    public long CurrentTime => (long)_playTime;
+    public double CurrentTime => _playTime;
     public long TotalTime => _totalTime;
 
     public void SetMode(PlaybackMode mode) => _mode = mode;
@@ -72,7 +72,7 @@ public class ReplayPlayer
         _playTime = _currentIndex > 0 ? _redoFrames[_currentIndex - 1].Time : 0;
     }
 
-    public void SeekByTime(long time)
+    public void SeekByTime(double time)
     {
         int lo = 0, hi = _redoFrames.Count - 1;
         while (lo <= hi)
@@ -84,11 +84,13 @@ public class ReplayPlayer
                 hi = mid - 1;
         }
         Seek(hi + 1);
+        _playTime = Math.Min(time, TotalTime);
     }
 
     public void Seek(int targetIndex)
     {
-        if (targetIndex < 0 || targetIndex > _redoFrames.Count) return;
+        if (targetIndex < 0) targetIndex = 0;
+        if (targetIndex >= _redoFrames.Count) targetIndex = _redoFrames.Count - 1;
 
         if (targetIndex > _currentIndex)
         {
@@ -118,14 +120,19 @@ public class ReplayPlayer
 
     public void OnTick()
     {
-        if (!_isPlaying || _currentIndex >= _redoFrames.Count)
-        { _isPlaying = false; return; }
+        if (!_isPlaying) return;
 
         double dt = (DateTime.UtcNow - _lastTime).TotalMilliseconds;
         if (_mode == PlaybackMode.Speed)
         {
+            if (_currentIndex >= _redoFrames.Count)
+                _currentIndex = _redoFrames.Count - 1;
+
             _playTime += dt * _speed;
             _lastTime = DateTime.UtcNow;
+
+            if (_playTime > _totalTime)
+            { _playTime = _totalTime; Pause(); }
 
             while (_currentIndex < _redoFrames.Count &&
                    _playTime >= _redoFrames[_currentIndex].Time)
@@ -135,7 +142,12 @@ public class ReplayPlayer
         }
         else if (_mode == PlaybackMode.Delay)
         {
-            if (dt >= _stepDelayTime)
+            if (_currentIndex >= _redoFrames.Count)
+            {
+                _currentIndex = _redoFrames.Count - 1;
+                Pause();
+            }
+            else if (dt >= _stepDelayTime)
             {
                 ApplyFrame(_redoFrames[_currentIndex++]);
                 _lastTime = DateTime.UtcNow;

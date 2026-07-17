@@ -17,8 +17,6 @@ public partial class ReplayPluginPlayerView
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(50) };
     private bool _seeking;
 
-    private bool IsSpeedMode => ModeCombo.SelectedIndex == 0;
-
     public ReplayPluginPlayerView()
     {
         InitializeComponent();
@@ -78,8 +76,8 @@ public partial class ReplayPluginPlayerView
         if (_seeking || _player == null) return;
         _seeking = true;
 
-        if (IsSpeedMode)
-            _player.SeekByTime((long)ProgressSlider.Value);
+        if (ModeCombo.SelectedIndex == 0)
+            _player.SeekByTime(ProgressSlider.Value);
         else
             _player.Seek((int)ProgressSlider.Value);
 
@@ -91,7 +89,7 @@ public partial class ReplayPluginPlayerView
     {
         if (_player == null) return;
 
-        var mode = IsSpeedMode ? PlaybackMode.Speed : PlaybackMode.Delay;
+        var mode = ModeCombo.SelectedIndex == 0 ? PlaybackMode.Speed : PlaybackMode.Delay;
         _player.SetMode(mode);
 
         RateCombo.Items.Clear();
@@ -114,7 +112,7 @@ public partial class ReplayPluginPlayerView
     {
         if (_player == null || RateCombo.SelectedIndex < 0) return;
 
-        if (IsSpeedMode)
+        if (ModeCombo.SelectedIndex == 0)
             _player.SetSpeed(Speeds[RateCombo.SelectedIndex]);
         else
             _player.SetDelay(Delays[RateCombo.SelectedIndex]);
@@ -128,7 +126,12 @@ public partial class ReplayPluginPlayerView
 
     private void UpdateDisplay()
     {
-        if (IsSpeedMode)
+        if (_player.IsPlaying)
+            PlayPauseButton.Content = "⏸";
+        else
+            PlayPauseButton.Content = "▶";
+
+        if (ModeCombo.SelectedIndex == 0)
         {
             var cur = TimeSpan.FromMilliseconds(_player.CurrentTime);
             var total = TimeSpan.FromMilliseconds(_player.TotalTime);
@@ -141,9 +144,9 @@ public partial class ReplayPluginPlayerView
         else
         {
             ProgressSlider.Value = _player.CurrentIndex;
-            ProgressSlider.Maximum = _player.FrameCount;
+            ProgressSlider.Maximum = _player.FrameCount - 1;
 
-            PositionText.Text = $"{_player.CurrentIndex} / {_player.FrameCount}";
+            PositionText.Text = $"{_player.CurrentIndex + 1} / {_player.FrameCount}";
         }
     }
 }

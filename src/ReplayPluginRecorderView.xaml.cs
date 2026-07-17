@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Win32;
@@ -35,20 +36,22 @@ public partial class ReplayPluginRecorderView
     private void StopRecording()
     {
         _timer.Stop();
+        _recorder.Stop();
 
-        var dialog = new SaveFileDialog { Filter = "Replay Files|*.TEditReplay" };
+        var worldName = Path.GetFileNameWithoutExtension(ViewModelLocator.WorldViewModel.CurrentFile);
+        var startTime = _recorder.Recording.StartTime.ToString("yyyyMMddHHmm");
+
+        var defaultName = $"{worldName}_{startTime}";
+        var defaultPath = Path.Combine(Path.GetTempPath(), $"{defaultName}.TEditReplay");
+        
+        var dialog = new SaveFileDialog { FileName = defaultName, Filter = "Replay Files|*.TEditReplay" };
         if (dialog.ShowDialog() == true)
-        {
-            _recorder.Stop();
             _recorder.Recording.Save(dialog.FileName);
-
-            RecordButton.Content = "⏺";
-            TimerText.Text = "00:00:00";
-        }
         else
-        {
-            _timer.Start();
-        }
+            _recorder.Recording.Save(defaultPath);
+
+        RecordButton.Content = "⏺";
+        TimerText.Text = "00:00:00";
     }
 
     private void OpenButton_Click(object sender, RoutedEventArgs e)
