@@ -33,21 +33,24 @@ public class ReplayRecorder
             DateTime writeTime = File.GetLastWriteTimeUtc(file);
             if (writeTime <= _lastTime) continue;
 
+            byte[] data;
+            try { data = File.ReadAllBytes(file); }
+            catch (IOException) { continue; }
+
             _lastTime = writeTime;
             Recording.Frames.Add(new ReplayFrame
             {
                 Index = Recording.Frames.Count,
                 Time = (long)(DateTime.UtcNow - _startTime).TotalMilliseconds,
-                Data = File.ReadAllBytes(file),
+                Data = data,
             });
         }
     }
 
-    public ReplayFile Stop()
+    public void Stop()
     {
         IsRecording = false;
         Recording.TotalTime = (long)(DateTime.UtcNow - _startTime).TotalMilliseconds;
         Recording.BaselineWorld = ViewModelLocator.WorldViewModel.CurrentWorld;
-        return Recording;
     }
 }

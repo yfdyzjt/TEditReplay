@@ -10,6 +10,7 @@ public enum PlaybackMode { Speed, Delay }
 public class ReplayPlayer
 {
     private readonly World _world;
+    private readonly long _totalTime;
     private readonly List<ReplayFrame> _undoFrames;
     private readonly List<ReplayFrame> _redoFrames = [];
 
@@ -23,6 +24,12 @@ public class ReplayPlayer
     private double _speed = 1.0;
     private int _stepDelayTime = 250;
 
+    public int CurrentIndex => _currentIndex;
+    public int FrameCount => _redoFrames.Count;
+    public bool IsPlaying => _isPlaying;
+    public long CurrentTime => (long)_playTime;
+    public long TotalTime => _totalTime;
+
     public void SetMode(PlaybackMode mode) => _mode = mode;
     public void SetSpeed(double speed) => _speed = speed;
     public void SetDelay(int ms) => _stepDelayTime = ms;
@@ -31,6 +38,7 @@ public class ReplayPlayer
     {
         _world = file.BaselineWorld;
         _undoFrames = file.Frames;
+        _totalTime = file.TotalTime;
 
         for (int i = file.Frames.Count - 1; i >= 0; i--)
         {
@@ -54,12 +62,28 @@ public class ReplayPlayer
     {
         if (_currentIndex >= _redoFrames.Count) return;
         ApplyFrame(_redoFrames[_currentIndex++]);
+        _playTime = _currentIndex > 0 ? _redoFrames[_currentIndex - 1].Time : 0;
     }
 
     public void StepBackward()
     {
         if (_currentIndex <= 0) return;
         ApplyFrame(_undoFrames[--_currentIndex]);
+        _playTime = _currentIndex > 0 ? _redoFrames[_currentIndex - 1].Time : 0;
+    }
+
+    public void SeekByTime(long time)
+    {
+        int lo = 0, hi = _redoFrames.Count - 1;
+        while (lo <= hi)
+        {
+            int mid = (lo + hi) / 2;
+            if (_redoFrames[mid].Time <= time)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+        Seek(hi + 1);
     }
 
     public void Seek(int targetIndex)
@@ -115,6 +139,7 @@ public class ReplayPlayer
             {
                 ApplyFrame(_redoFrames[_currentIndex++]);
                 _lastTime = DateTime.UtcNow;
+                _playTime = _currentIndex > 0 ? _redoFrames[_currentIndex - 1].Time : 0;
             }
         }
     }
