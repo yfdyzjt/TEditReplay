@@ -17,10 +17,14 @@
         <ui:TitleBar Grid.Row="0" Title="Replay Recorder"/>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="8">
-            <Button x:Name="RecordButton" Content="&#x23FA;" Width="48" Height="36"
-                    FontSize="18" Margin="0,0,4,0" Click="RecordButton_Click"/>
-            <Button x:Name="OpenButton" Content="&#x1F4C2;" Width="48" Height="36"
-                    FontSize="18" Margin="0,0,8,0" Click="OpenButton_Click"/>
+            <Button x:Name="RecordButton" Width="48" Height="36"
+                    Padding="0" Margin="0,0,4,0" Click="RecordButton_Click">
+                <ui:SymbolIcon x:Name="RecordIcon" Symbol="Record20" FontSize="22"/>
+            </Button>
+            <Button x:Name="OpenButton" Width="48" Height="36"
+                    Padding="0" Margin="0,0,8,0" Click="OpenButton_Click">
+                <ui:SymbolIcon Symbol="FolderOpen20" FontSize="22"/>
+            </Button>
             <TextBlock x:Name="TimerText" Text="00:00:00 F:0" VerticalAlignment="Center"
                        FontFamily="Consolas" FontSize="36"/>
         </StackPanel>

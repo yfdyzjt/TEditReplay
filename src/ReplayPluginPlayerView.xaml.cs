@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using TEdit.ViewModel;
+using Symbol = Wpf.Ui.Controls.SymbolRegular;
 
 namespace TEdit.Editor.Plugins;
 
@@ -55,13 +56,15 @@ public partial class ReplayPluginPlayerView
         {
             _player.Pause();
             _timer.Stop();
-            PlayPauseButton.Content = "▶";
+            PlayPauseIcon.Symbol = Symbol.Play20;
+            PlayPauseButton.ClearValue(System.Windows.Controls.Control.ForegroundProperty);
         }
         else
         {
             _player.Play();
             _timer.Start();
-            PlayPauseButton.Content = "⏸";
+            PlayPauseIcon.Symbol = Symbol.Pause20;
+            PlayPauseButton.Foreground = System.Windows.Media.Brushes.Red;
         }
     }
 
@@ -127,9 +130,15 @@ public partial class ReplayPluginPlayerView
     private void UpdateDisplay()
     {
         if (_player.IsPlaying)
-            PlayPauseButton.Content = "⏸";
+        {
+            PlayPauseIcon.Symbol = Symbol.Pause20;
+            PlayPauseButton.Foreground = System.Windows.Media.Brushes.Red;
+        }
         else
-            PlayPauseButton.Content = "▶";
+        {
+            PlayPauseIcon.Symbol = Symbol.Play20;
+            PlayPauseButton.ClearValue(System.Windows.Controls.Control.ForegroundProperty);
+        }
 
         if (ModeCombo.SelectedIndex == 0)
         {

@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using Symbol = Wpf.Ui.Controls.SymbolRegular;
 
 namespace TEdit.Editor.Plugins;
 
@@ -28,7 +29,8 @@ public partial class ReplayPluginRecorderView
 
     private void StartRecording()
     {
-        RecordButton.Content = "⏹";
+        RecordIcon.Symbol = Symbol.Stop20;
+        RecordButton.Foreground = System.Windows.Media.Brushes.Red;
         _recorder.Start();
         _timer.Start();
     }
@@ -51,7 +53,8 @@ public partial class ReplayPluginRecorderView
         else
             _recorder.Recording.Save(defaultPath);
 
-        RecordButton.Content = "⏺";
+        RecordIcon.Symbol = Symbol.Record20;
+        RecordButton.ClearValue(System.Windows.Controls.Control.ForegroundProperty);
         TimerText.Text = "00:00:00 F:0";
     }
 
