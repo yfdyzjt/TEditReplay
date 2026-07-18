@@ -12,19 +12,19 @@ A record-and-replay plugin for [TEdit](https://github.com/BinaryConstruct/Terrar
 
 - **Record** operations as frames
 - **Playback** in two modes:
-  - **Speed** — replay at original timing, with adjustable speed multiplier
-  - **Delay** — step through frames at a fixed interval
-- **Seek** — drag the progress bar to jump to any point
-- **Step** — move forward / backward one frame at a time
+  - **Speed** replay at original timing, with adjustable speed multiplier
+  - **Delay** step through frames at a fixed interval
+- **Seek** drag the progress bar to jump to any point
+- **Step** move forward / backward one frame at a time
 
 ![recorder](img/recorder_2.png)
 
 - **录制** 将操作记录为帧
 - **回放** 支持两种模式：
-  - **Speed** — 按原始时间回放，可调节倍速
-  - **Delay** — 按固定间隔逐帧播放
-- **定位** — 拖动进度条跳转到任意位置
-- **步进** — 逐帧前进 / 后退
+  - **Speed** 按原始时间回放，可调节倍速
+  - **Delay** 按固定间隔逐帧播放
+- **定位** 拖动进度条跳转到任意位置
+- **步进** 逐帧前进 / 后退
 
 ## Usage / 使用方法
 
